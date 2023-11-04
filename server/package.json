@@ -9,7 +9,6 @@
     "migrate-latest": "npx knex migrate:latest",
     "migrate-down": "npx knex migrate:down",
     "seed-data": "npx knex seed:run",
-    "prebuild": "npm run migrate-latest && npm run seed-data",
     "build": "npm install"
   },
   "dependencies": {
