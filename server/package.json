@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/server.js",
+    "migrate-latest": "npx knex migrate:latest",
+    "migrate-down": "npx knex migrate:down",
+    "seed-data": "npx knex seed:run",
+    "prebuild": "npm run migrate-latest && npm run seed-data",
+    "build": "npm install"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-session-knex": "^3.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "knex": "^2.5.1",
+    "path": "^0.12.7"
+  },
+  "author": "",
+  "license": "ISC"
+}
