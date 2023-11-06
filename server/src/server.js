@@ -18,23 +18,24 @@ app.use(function (req, res, next) {
 
 
 //serving static html for every path
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
-  });
+// app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
+//   });
 
 app.get("/", (req, res, next) => {
     console.log("get route", req.testing);
     res.end();
 });
 
-app.ws("/", (req, res, next) => {
-    ws.on("message", (msg) => {
-        console.log(msg);
+let i = 0;
+app.ws('/echo', function(ws, req) {
+    ws.on('message', function(msg) {
+      i++;
+      console.log(msg + " " + i);
+      ws.send("Recieved message: " + i + " " + msg);
     });
-    console.log("socket", req.testing);
-});
-
-
+    console.log('socket', req.testing);
+  });
 
 
 app.listen(port, () => {
