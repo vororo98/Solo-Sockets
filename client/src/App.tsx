@@ -10,7 +10,7 @@ function App() {
 
   // Create WebSocket connection. Define behaviour.
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://https://super-robot-programmer.onrender.com//echo");
+    socketRef.current = new WebSocket("wss://https://super-robot-programmer.onrender.com//echo");
     const socket = socketRef.current;
 
      // Connection opened
