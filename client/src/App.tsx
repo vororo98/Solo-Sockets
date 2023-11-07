@@ -8,9 +8,9 @@ function App() {
 
   const socketRef = useRef<WebSocket | null>(null);
 
-  // Create WebSocket connection. Define behaviour.
+  // Create WebSocket connection. Define behaviour. super-robot-programmer.onrender.com
   useEffect(() => {
-    socketRef.current = new WebSocket("wss://super-robot-programmer.onrender.com//echo");
+    socketRef.current = new WebSocket("wss://super-robot-programmer.onrender.com/echo");
     const socket = socketRef.current;
 
      // Connection opened
