@@ -32,13 +32,22 @@ app.ws('/echo', function(ws, req) {
     ws.on('message', function(msg) {
       i++;
       console.log(msg + " " + i);
-      //ws.send("Recieved message: " + i + " " + msg);
       expressWs.getWss().clients.forEach(function (client) {
         client.send("Recieved message: " + i + " " + msg);
       });
     });
     console.log('socket', req.testing);
   });
+
+app.ws("/game", function(ws, req) {
+  ws.on("message", function(msg) {
+    if(msg == "add") {
+      expressWs.getWss().clients.forEach(function (client) {
+        client.send('{"type": "ball", "color": "#ff0000"}');
+      });
+    }
+  });
+})
 
 
 app.listen(port, () => {
