@@ -39,11 +39,27 @@ app.ws('/echo', function(ws, req) {
     console.log('socket', req.testing);
   });
 
+  let testPlayerID = 1;
 app.ws("/game", function(ws, req) {
+  ws.send(`{"type": "player", "player": ${testPlayerID}}`);
+  ws["PLAYERID"] = testPlayerID;
+  testPlayerID++;
   ws.on("message", function(msg) {
+    console.log(msg)
+    let id = ws.PLAYERID;
     if(msg == "add") {
       expressWs.getWss().clients.forEach(function (client) {
-        client.send('{"type": "ball", "color": "#ff0000"}');
+        client.send(`{"type": "ball", "color": "#ff0000", "player": ${id}}`);
+      });
+    }
+    else if(msg == "right") {
+      expressWs.getWss().clients.forEach(function (client) {
+        client.send(`{"type": "move", "direction": "right", "player": ${id}}`);
+      });
+    }
+    else if(msg == "left") {
+      expressWs.getWss().clients.forEach(function (client) {
+        client.send(`{"type": "move", "direction": "left", "player": ${id}}`);
       });
     }
   });
