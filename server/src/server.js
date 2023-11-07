@@ -32,7 +32,10 @@ app.ws('/echo', function(ws, req) {
     ws.on('message', function(msg) {
       i++;
       console.log(msg + " " + i);
-      ws.send("Recieved message: " + i + " " + msg);
+      //ws.send("Recieved message: " + i + " " + msg);
+      expressWs.getWss().clients.forEach(function (client) {
+        client.send("Recieved message: " + i + " " + msg);
+      });
     });
     console.log('socket', req.testing);
   });
