@@ -44,8 +44,9 @@ app.ws("/game", function(ws, req) {
   ws.send(`{"type": "player", "player": ${testPlayerID}}`);
   ws["PLAYERID"] = testPlayerID;
   testPlayerID++;
-  ws.on("message", function(msg) {
-    console.log(msg)
+  ws.on("message", async function(msg) {
+    console.log(typeof msg)
+    
     let id = ws.PLAYERID;
     if(msg == "add") {
       expressWs.getWss().clients.forEach(function (client) {
@@ -60,6 +61,15 @@ app.ws("/game", function(ws, req) {
     else if(msg == "left") {
       expressWs.getWss().clients.forEach(function (client) {
         client.send(`{"type": "move", "direction": "left", "player": ${id}}`);
+      });
+    }
+    else {
+      let parsedMessage = await JSON.parse(msg);
+      console.log(parsedMessage);
+      let response = JSON.stringify({"type": "actions", "actions": parsedMessage.actions, "player": id});
+      console.log(response);
+      expressWs.getWss().clients.forEach(function (client) {
+        client.send(response);
       });
     }
   });

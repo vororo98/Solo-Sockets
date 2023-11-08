@@ -10,18 +10,23 @@ function App() {
   //const [count, setCount] = useState(0)
   const [player, setPlayer] = useState(0);
   //const arena = [0,1,2,3,4,5,6];
-  const [p1Pos, setP1Pos] = useState(2);
+  const [p1Pos, setP1Pos] = useState(3);
   const [p2Pos, setP2Pos] = useState(4);
+  const [plan, setPlan] = useState<Array<string>>([]);
+  const [p1Actions, setp1Actions] = useState<Array<string>>([]);
+  const [p2Actions, setp2Actions] = useState<Array<string>>([]);
+  const posRef = useRef<number>();
+  posRef.current = p1Pos;
   const socketRef = useRef<WebSocket | null>(null);
 
   // Create WebSocket connection. Define behaviour. wss://super-robot-programmer.onrender.com/echo ws://localhost:5100/echo
   useEffect(() => {
-    socketRef.current = new WebSocket("wss://super-robot-programmer.onrender.com/game");
+    socketRef.current = new WebSocket("ws://localhost:5100/game");
     const socket = socketRef.current;
 
      // Connection opened
      socket.addEventListener("open", () => {
-      socket.send("Hello Server!");
+      //socket.send("Hello Server!");
     });
     
     //Connection closed
@@ -35,6 +40,26 @@ function App() {
     });    
   }, []);
 
+  useEffect(() => {
+    if(plan.length == 3){
+      let message = JSON.stringify({"type": "actions", "actions": plan});
+      socketRef.current!.send(message);
+      setPlan([]);
+    }
+  }, [plan]);
+
+  useEffect(() => {
+    if(p1Actions.length == 3 && p2Actions.length == 3){
+      let arr = [];
+      for(let i = 0; i < p1Actions.length; i++){
+        arr[i] = [p1Actions[i], p2Actions[i]];
+      }
+      setp1Actions([]);
+      setp2Actions([]);
+      parseActions(arr);
+    }
+  }, [p1Actions, p2Actions]);
+
   //Handlers
   async function handleMessage(msg: string){
     let parsedMessage = await JSON.parse(msg);
@@ -47,25 +72,94 @@ function App() {
         setPlayer(parsedMessage.player);
         break;
       case "move":
-        if(parsedMessage.player == 1){
-          if(parsedMessage.direction == "left"){
-            setP1Pos((p1Pos) => p1Pos - 1);
-          }
-          else{
-            setP1Pos((p1Pos) => p1Pos + 1);
-          }
-        }
-        else if(parsedMessage.player == 2){
-          if(parsedMessage.direction == "left"){
-            setP2Pos((p2Pos) => p2Pos - 1);
-          }
-          else{
-            setP2Pos((p2Pos) => p2Pos + 1);
-          }
-        }
+        handleMovement(parsedMessage);
+        break;
+      case "actions":
+        handleActions(parsedMessage);
         break;
       default:
         console.log("unknown message type");
+    }
+  }
+
+  //obj {type: actions, p1Actions: [1,2,3,], p2Actions: [1,2,3]}
+  const handleActions = (msg: any) => {
+    if(msg.player == 1) setp1Actions(msg.actions);
+    else if(msg.player == 2) setp2Actions(msg.actions);
+
+    
+  }
+
+  //actions: string, "left", "right", "attack", Array array [0] p1, [1] p2
+  const parseActions = (actions: Array<Array<string>>) => {
+    const timeout = setTimeout(() => {
+      let currActions = actions.splice(0,1);
+      console.log("parsing: " + currActions);
+      for(let i = 1; i <= 2; i++) {
+        if (currActions[0][i - 1] == "left" || currActions[0][i - 1] == "right") newHandleMovement(i, currActions[0][i - 1]);
+        else if (currActions[0][i - 1] == "attack") handleAttack(i);
+      }
+      if(actions.length > 0) parseActions(actions);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }
+
+  const handleAttack = (player: number) =>{
+    if(player == 1) console.log("player 1 attacks");
+    else if(player == 2) console.log("player 2 attacks");
+  }
+
+  const newHandleMovement = (player: number, dir: string) => {
+    if(player == 1){
+      if(dir == "left"){
+        setP1Pos((p1Pos) => {
+          if (p1Pos - 1 >= 0) return p1Pos - 1;
+          return 0});
+      }
+      else if(dir == "right"){
+        setP1Pos((p1Pos) => {
+          if(p1Pos + 1 <= 6) return p1Pos + 1;
+          return 6});
+      }
+    }
+    else if(player == 2){
+      if(dir == "left"){
+        setP2Pos((p2Pos) => {
+          if(p2Pos - 1 >= 0) return p2Pos - 1;
+          return 0});
+      }
+      else if(dir == "right"){
+        setP2Pos((p2Pos) => {
+          if(p2Pos + 1 <= 6) return p2Pos + 1;
+          return 6});
+      }
+    }
+  }
+
+  const handleMovement = (msg: any) => {
+    if(msg.player == 1){
+      if(msg.direction == "left"){
+        setP1Pos((p1Pos) => {
+          if (p1Pos - 1 >= 0) return p1Pos - 1;
+          return 0});
+      }
+      else{
+        setP1Pos((p1Pos) => {
+          if(p1Pos + 1 <= 6) return p1Pos + 1;
+          return 6});
+      }
+    }
+    else if(msg.player == 2){
+      if(msg.direction == "left"){
+        setP2Pos((p2Pos) => {
+          if(p2Pos - 1 >= 0) return p2Pos - 1;
+          return 0});
+      }
+      else{
+        setP2Pos((p2Pos) => {
+          if(p2Pos + 1 <= 6) return p2Pos + 1;
+          return 6});
+      }
     }
   }
 
@@ -77,27 +171,9 @@ function App() {
     ctx.fill()
   }
 
-  // let fired = false
-  // document.body.addEventListener('keydown', function(event) {
-  //   if (fired || event.repeat) return;
-  //   fired = true;
-  //   let boolTest = false;
-  //   console.log(event.key);
-  //   if(event.key == "arrowRight" && !boolTest){
-  //     boolTest = true;
-  //     if(socketRef.current != null) socketRef.current.send("right")
-  //   }
-  //   else if(event.key == "arrowLeft" && !boolTest) {
-  //     boolTest = true;
-  //     if(socketRef.current != null) socketRef.current.send("left")
-  //   }
-  // });
-
-  // document.body.addEventListener("keyup", function() {
-  //   fired = false;
-  // });
-
- 
+  const addToPlan = (item: string) => {
+    if(plan.length < 3) setPlan((prevPlan) => [...prevPlan, item]);
+  }
 
   return (
     <>
@@ -116,14 +192,19 @@ function App() {
       <Canvas draw={drawer}>Hi</Canvas>
       <div className="card">
         <button onClick={() => {
-          if(socketRef.current != null) socketRef.current.send("right");
-          }}>
-          player {player} right
-        </button>
-        <button onClick={() => {
-          if(socketRef.current != null) socketRef.current.send("left");
+          addToPlan("left");//socketRef.current.send("left");
           }}>
           player {player} left
+        </button>
+        <button onClick={() => {
+          addToPlan("attack");
+          }}>
+          player {player} attack
+        </button>
+        <button onClick={() => {
+          addToPlan("right");
+          }}>
+          player {player} right
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
