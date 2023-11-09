@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import Canvas from './Canvas'
-//require("dotenv")
-//const DB_URL = process.env.DATABASE_URL;¨
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [player, setPlayer] = useState(0);
-  //const arena = [0,1,2,3,4,5,6];
+  //const arena = [0,1,2,3,4,5,6]; //just to show the number of possible positions by players
   const [p1Pos, setP1Pos] = useState(2);
   const [p2Pos, setP2Pos] = useState(4);
   const [p1Hp, setP1Hp] = useState(3);
@@ -17,6 +16,7 @@ function App() {
   const posRef = useRef<number>();
   posRef.current = p1Pos;
   const socketRef = useRef<WebSocket | null>(null);
+  const navigate = useNavigate();
 
   // Create WebSocket connection. Define behaviour. wss://super-robot-programmer.onrender.com/game ws://localhost:5100/game
   useEffect(() => {
@@ -32,6 +32,7 @@ function App() {
     //Connection closed
     socket.addEventListener("close", () => {
       console.log("closed socket");
+      navigate("/profile");
     })
 
     // Listen for messages
