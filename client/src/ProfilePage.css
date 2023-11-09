@@ -1,0 +1,16 @@
+.Container-Profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px
+}
+
+.Score {
+    color: #18c44c;
+    margin-bottom: 0px;
+}
+
+.Greeting {
+    color: #18c44c;
+    margin-bottom: 0px;
+}

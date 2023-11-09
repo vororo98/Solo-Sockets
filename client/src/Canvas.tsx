@@ -7,8 +7,7 @@ const Canvas = (props: any) => {
 
     function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     
-        let { width, height } = canvas.getBoundingClientRect()
-        console.log(width + " " + height)
+        let { width, height } = canvas.getBoundingClientRect();
         width = 400;
         if (canvas.width !== width || canvas.height !== height) {
           canvas.width = width

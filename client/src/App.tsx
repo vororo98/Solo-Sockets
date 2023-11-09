@@ -6,10 +6,13 @@ import { useNavigate } from "react-router-dom";
 function App() {
   const [player, setPlayer] = useState(0);
   //const arena = [0,1,2,3,4,5,6]; //just to show the number of possible positions by players
+  const [p1Name, setP1Name] = useState("Waiting");
+  const [p2Name, setP2Name] = useState("Waiting");
   const [p1Pos, setP1Pos] = useState(2);
   const [p2Pos, setP2Pos] = useState(4);
   const [p1Hp, setP1Hp] = useState(3);
   const [p2Hp, setP2Hp] = useState(3);
+  const [gameOver, setGameOver] = useState(false);
   const [plan, setPlan] = useState<Array<string>>([]);
   const [p1Actions, setp1Actions] = useState<Array<string>>([]);
   const [p2Actions, setp2Actions] = useState<Array<string>>([]);
@@ -62,13 +65,26 @@ function App() {
   }, [p1Actions, p2Actions]);
 
   useEffect(() => {
-    if(p1Hp <= 0) {
-      console.log("player 2 wins");
-      socketRef.current?.send(`{"type": "reset"}`);
+    if(p1Hp <= 0 && p2Hp <= 0) {
+      setGameOver(true);
+    }
+    else if(p1Hp <= 0) {
+      if(player == 2){
+        socketRef.current?.send(`{"type": "victory"}`);
+      }
+      if(player == 1){
+        socketRef.current?.send(`{"type": "defeat"}`);
+      }
+      setGameOver(true);
     }
     else if(p2Hp <= 0) {
-      console.log("player 1 wins");
-      socketRef.current?.send(`{"type": "reset"}`);
+      if(player == 1){
+        socketRef.current?.send(`{"type": "victory"}`);
+      }
+      else if(player == 2){
+        socketRef.current?.send(`{"type": "defeat"}`);
+      }
+      setGameOver(true);
     }
   }, [p1Hp, p2Hp]);
 
@@ -80,10 +96,15 @@ function App() {
         console.log(parsedMessage.body);
       break;
       case "player":
-        setPlayer(parsedMessage.player);
+        setPlayer(parsedMessage.playerID);
+        setP1Name(parsedMessage.player1Name);
+        setP2Name(parsedMessage.player2Name);
         break;
       case "actions":
         handleActions(parsedMessage);
+        break;
+      case "playerNames":
+
         break;
       default:
         console.log("unknown message type");
@@ -106,7 +127,7 @@ function App() {
         else if (currActions[0][i - 1] == "attack") handleAttack(i);
       }
       if(actions.length > 0) parseActions(actions);
-    }, 1000);
+    }, 3000);
     return () => clearTimeout(timeout);
   }
 
@@ -163,12 +184,18 @@ function App() {
   return (
     <>
       <h1>Super Robot Programmer!!!</h1>
-      <div className='Container-Life'>
-        <p>Player 1 HP: {p1Hp}</p>
-        <p>Player 2 HP: {p2Hp}</p>
+      <div className='container-life'>
+        <div className='container-life-data'>
+        <p>Player 1: <span>{p1Name}</span></p>
+        <p>HP: <span>{p1Hp}</span></p>
+        </div>
+        <div className='container-life-data'>
+        <p>Player 2: <span>{p2Name}</span></p>
+        <p>HP: <span>{p2Hp}</span></p>
+        </div>
       </div>
       <Canvas draw={drawer}>Hi</Canvas>
-      <div className="card">
+      <div className="container-input">
         <button onClick={() => {
           addToPlan("left");//socketRef.current.send("left");
           }}>
@@ -184,12 +211,15 @@ function App() {
           }}>
           player {player} right
         </button>
-        <button onClick={() => {
+       
+      </div>
+      {gameOver ? (
+         <button id="game-over-button" onClick={() => {
           socketRef.current?.send(`{"type": "reset"}`);
           }}>
-          RESET GAME DO NOT PRESS
+          Game Over.
         </button>
-      </div>
+      ) : <></>}
     </>
   )
 }

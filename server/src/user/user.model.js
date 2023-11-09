@@ -46,7 +46,7 @@ module.exports = {
 
     update(user) {
         return knex(users)
-        .where("name", "=", user.user_name)
+        .where("user_name", "=", user.user_name)
         .returning("id")
         .update(user)
         .then((res) => {

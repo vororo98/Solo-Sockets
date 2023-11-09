@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import "./CreateAccount.css"
 
 const CreateAccount = () => {
     const usernameInput = useRef<HTMLInputElement>(null);
@@ -29,7 +30,7 @@ const CreateAccount = () => {
 
       return (
         <>
-          <h1 className="title-createacc">Boxed IN</h1>
+          <h1 className="title-createacc">Super Account Programmer!!!</h1>
           <form className="form-createacc" action="#" onSubmit={handleRequest}>
             <label className="label-createacc" htmlFor="username">
               Username

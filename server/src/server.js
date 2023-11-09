@@ -50,7 +50,8 @@ app.post("/create", userController.create);
 
 app.get("/currentUser", userController.getCurrentUser);
 
-app.patch("/currentUser", userController.updateScore);
+app.patch("/userWon", userController.updateWins);
+app.patch("/userLost", userController.updateLosses);
 
 // //login user
 app.post(
@@ -107,8 +108,8 @@ app.ws("/game",function(ws, req) {
       client.PLAYERID = 2;
       client.HASOPPONENT = true;
       ws.HASOPPONENT = true;
-      ws.send(`{"type": "player", "player": ${ws.PLAYERID}}`);
-      client.send(`{"type": "player", "player": ${client.PLAYERID}}`);
+      ws.send(`{"type": "player", "playerID": ${ws.PLAYERID}, "player1Name": "${ws.PLAYERNAME}", "player2Name": "${client.PLAYERNAME}"}`);
+      client.send(`{"type": "player", "playerID": ${client.PLAYERID}, "player1Name": "${ws.PLAYERNAME}", "player2Name": "${client.PLAYERNAME}"}`);
     }
   }); 
 
@@ -124,6 +125,12 @@ app.ws("/game",function(ws, req) {
           client.send(`{"type": "message", "body": "New client connected"}`);
         }); 
       break;
+      case "victory":
+        userController.updateWins(ws.PLAYERNAME);
+      break;
+      case "defeat":
+        userController.updateLosses(ws.PLAYERNAME);
+      break;
       case "actions":
         let response = JSON.stringify({"type": "actions", "actions": parsedMessage.actions, "player": id});
         console.log(response);
@@ -132,17 +139,12 @@ app.ws("/game",function(ws, req) {
       });
       break;
       case "reset": {
-        testPlayerID = 1;
-        expressWs.getWss().clients.forEach((socket) => {
-          // Soft close
-          socket.close();
-        
-          process.nextTick(() => {
-            if ([socket.OPEN, socket.CLOSING].includes(socket.readyState)) {
-              // Socket still hangs, hard close
-              socket.terminate();
-            }
-          });
+        ws.close();
+        process.nextTick(() => {
+          if ([ws.OPEN, ws.CLOSING].includes(ws.readyState)) {
+            // Socket still hangs, hard close
+            ws.terminate();
+          }
         });
       }
     }

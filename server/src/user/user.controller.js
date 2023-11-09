@@ -49,9 +49,14 @@ module.exports = {
         }
       },
 
-      async updateScore(req, res) {
-        const name = req.session.user;
-        userModel.update({"user_name": name, "score": req.body.score});
-        res.sendStatus(200);
+      async updateWins(str) {
+        let result = await userModel.getByName(str);
+        userModel.update({"user_name": result[0].user_name, "wins": result[0].wins + 1});
+        //res.sendStatus(200);
+      },
+      async updateLosses(str) {
+        let result = await userModel.getByName(str);
+        userModel.update({"user_name": result[0].user_name, "losses": result[0].losses + 1});
+        //res.sendStatus(200);
       },
 };

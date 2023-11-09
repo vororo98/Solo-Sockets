@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./ProfilePage.css"
 
 const ProfilePage = () => {
     const [currentUser, setCurrentUser] = useState({"id": 0, "user_name": "", "wins": 0, "losses": 0});
@@ -18,7 +19,7 @@ const ProfilePage = () => {
 
     return (
         <>
-        <h1 className="Title-Profile-Page" >Super Robot Programmer!!!</h1>
+        <h1 className="Title-Profile-Page" >Super Profile Programmer!!!</h1>
           <div className="Container-Profile">
           <div className="Greeting" >Hello, {currentUser.user_name}</div>
           <div className="Score" >Wins: {currentUser.wins}</div>
