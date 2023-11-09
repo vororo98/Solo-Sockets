@@ -127,7 +127,7 @@ function App() {
         else if (currActions[0][i - 1] == "attack") handleAttack(i);
       }
       if(actions.length > 0) parseActions(actions);
-    }, 3000);
+    }, 1000);
     return () => clearTimeout(timeout);
   }
 
