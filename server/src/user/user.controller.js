@@ -24,6 +24,17 @@ module.exports = {
         }
       },
 
+      async getCurrentUser(req, res) {
+        try{
+        let result = await userModel.getByName(req.session.user);
+        let msg = JSON.stringify(result);
+        console.log(msg);
+        res.status(200).send(msg);
+        } catch (err) {
+          res.status(500).send("session user does not exist");
+        }
+      },
+
       async login(data) {
         const user = await userModel.checkUser(data.user_name);
         if(user[0] == undefined) return false;
@@ -36,5 +47,11 @@ module.exports = {
         } else {
           return false;
         }
+      },
+
+      async updateScore(req, res) {
+        const name = req.session.user;
+        userModel.update({"user_name": name, "score": req.body.score});
+        res.sendStatus(200);
       },
 };

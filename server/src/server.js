@@ -48,6 +48,10 @@ app.get("/", (req, res, next) => {
 
 app.post("/create", userController.create);
 
+app.get("/currentUser", userController.getCurrentUser);
+
+app.patch("/currentUser", userController.updateScore);
+
 // //login user
 app.post(
   "/login",
@@ -88,13 +92,26 @@ app.ws('/echo', function(ws, req) {
     console.log('socket', req.testing);
   });
 
-  let testPlayerID = 1;
+  //let testPlayerID = 1; 
 app.ws("/game",function(ws, req) {
   if(typeof req.session.user != "string") ws.close();
   console.log("This req comes from: " + req.session.user)  
-  ws.send(`{"type": "player", "player": ${testPlayerID}}`);
-  ws["PLAYERID"] = testPlayerID;
-  testPlayerID++;
+  
+  ws["HASOPPONENT"] = false;
+  ws["PLAYERID"] = 0;
+  ws["PLAYERNAME"] = req.session.user;
+  expressWs.getWss().clients.forEach(function (client) {
+    console.log(client.PLAYERNAME)
+    if(client.HASOPPONENT == false && ws.HASOPPONENT == false && client.PLAYERNAME != ws.PLAYERNAME){
+      ws.PLAYERID = 1;
+      client.PLAYERID = 2;
+      client.HASOPPONENT = true;
+      ws.HASOPPONENT = true;
+      ws.send(`{"type": "player", "player": ${ws.PLAYERID}}`);
+      client.send(`{"type": "player", "player": ${client.PLAYERID}}`);
+    }
+  }); 
+
   ws.on("message", async function(msg) {
     let id = ws.PLAYERID;
     let parsedMessage = await JSON.parse(msg);

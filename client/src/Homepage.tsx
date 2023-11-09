@@ -20,13 +20,13 @@ const Homepage = () => {
       },
       body: JSON.stringify(userData),
     }).then((res) =>
-      res.status == 200 ? navigate("/play") : console.log(res.status)
+      res.status == 200 ? navigate("/profile") : console.log(res.status)
     );
   };
 
     return (
         <>
-          <h1 className="title-login">Boxed IN</h1>
+          <h1 className="title-login">Super Robot Programmer!!!</h1>
           <div className="container-login">
             <form className="form-login" action="#" onSubmit={handleRequest}>
               <label className="label-login" htmlFor="username">

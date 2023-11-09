@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+import "./Canvas.css"
 
 const Canvas = (props: any) => {
     const { draw, ...rest } = props
@@ -6,8 +7,9 @@ const Canvas = (props: any) => {
 
     function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     
-        const { width, height } = canvas.getBoundingClientRect()
-    
+        let { width, height } = canvas.getBoundingClientRect()
+        console.log(width + " " + height)
+        width = 400;
         if (canvas.width !== width || canvas.height !== height) {
           canvas.width = width
           canvas.height = height
@@ -52,7 +54,7 @@ const Canvas = (props: any) => {
       }, [draw])
 
 
-    return <canvas ref={canvasRef} {...rest}></canvas>
+    return <canvas className='canvas-game' ref={canvasRef} {...rest}></canvas>
 }
 
 export default Canvas

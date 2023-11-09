@@ -162,6 +162,10 @@ function App() {
   return (
     <>
       <h1>Super Robot Programmer!!!</h1>
+      <div className='Container-Life'>
+        <p>Player 1 HP: {p1Hp}</p>
+        <p>Player 2 HP: {p2Hp}</p>
+      </div>
       <Canvas draw={drawer}>Hi</Canvas>
       <div className="card">
         <button onClick={() => {
