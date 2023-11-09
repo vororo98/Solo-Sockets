@@ -18,9 +18,9 @@ function App() {
   posRef.current = p1Pos;
   const socketRef = useRef<WebSocket | null>(null);
 
-  // Create WebSocket connection. Define behaviour. wss://super-robot-programmer.onrender.com/echo ws://localhost:5100/echo
+  // Create WebSocket connection. Define behaviour. wss://super-robot-programmer.onrender.com/game ws://localhost:5100/game
   useEffect(() => {
-    socketRef.current = new WebSocket("ws://localhost:5100/game");
+    socketRef.current = new WebSocket("wss://super-robot-programmer.onrender.com/game");
     const socket = socketRef.current;
 
      // Connection opened
